@@ -22,11 +22,23 @@
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+      </intent-filter>
 
       <meta-data
         android:name="android.app.lib_name"
         android:value="" />
     </activity>
+
+    <receiver android:name=".TranslateBuddyProvider"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+        android:resource="@xml/translate_widget_info" />
+    </receiver>
   </application>
 
 </manifest>

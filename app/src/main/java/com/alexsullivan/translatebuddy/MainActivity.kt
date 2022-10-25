@@ -1,6 +1,10 @@
 package com.alexsullivan.translatebuddy
 
+import android.app.Activity
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.os.Bundle
+import android.widget.RemoteViews
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +27,22 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
+
+    setupWidgetInfo()
+  }
+
+  private fun setupWidgetInfo() {
+    setResult(Activity.RESULT_CANCELED)
+    val appWidgetId = intent?.extras?.getInt(
+      AppWidgetManager.EXTRA_APPWIDGET_ID,
+      AppWidgetManager.INVALID_APPWIDGET_ID
+    ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+    val appWidgetManager = AppWidgetManager.getInstance(this)
+    val views = RemoteViews(packageName, R.layout.translate_widget)
+    appWidgetManager.updateAppWidget(appWidgetId, views)
+    val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+    setResult(Activity.RESULT_OK, resultValue)
+    finish()
   }
 }
 

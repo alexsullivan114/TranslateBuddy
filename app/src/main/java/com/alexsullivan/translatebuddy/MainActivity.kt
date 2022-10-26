@@ -32,14 +32,11 @@ class MainActivity : ComponentActivity() {
   }
 
   private fun setupWidgetInfo() {
-    setResult(Activity.RESULT_CANCELED)
     val appWidgetId = intent?.extras?.getInt(
       AppWidgetManager.EXTRA_APPWIDGET_ID,
       AppWidgetManager.INVALID_APPWIDGET_ID
     ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-    val appWidgetManager = AppWidgetManager.getInstance(this)
-    val views = RemoteViews(packageName, R.layout.translate_widget)
-    appWidgetManager.updateAppWidget(appWidgetId, views)
+    TranslateBuddyProvider.updateInitialWidget(this, appWidgetId)
     val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
     setResult(Activity.RESULT_OK, resultValue)
     finish()

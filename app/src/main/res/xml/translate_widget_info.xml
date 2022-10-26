@@ -9,6 +9,5 @@
   android:initialLayout="@layout/translate_widget"
   android:configure="com.alexsullivan.translatebuddy.MainActivity"
   android:resizeMode="horizontal|vertical"
-  android:widgetCategory="home_screen"
-  android:widgetFeatures="reconfigurable|configuration_optional">
+  android:widgetCategory="home_screen">
 </appwidget-provider>

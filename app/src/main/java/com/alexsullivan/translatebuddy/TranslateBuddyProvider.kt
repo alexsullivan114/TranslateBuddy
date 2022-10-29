@@ -8,16 +8,24 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
+import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
 
 
 class TranslateBuddyProvider : AppWidgetProvider() {
   override fun onReceive(context: Context, intent: Intent) {
     super.onReceive(context, intent)
     if (intent.action == NEXT_TRANSLATION_ACTION) {
-      Log.d("DEBUGGG:", "In action block")
+      val prefs = TranslationBuddyPreferences(context)
+      val currentItem = prefs.getCurrentTranslation()
+      val translations = prefs.getTranslations()
+      Log.d("DEBUGGG:", "Translations: $translations")
+      val newIndex = (translations.indexOf(currentItem) + 1) % translations.lastIndex
+      Log.d("DEBUGGG:", "New index: $newIndex")
+      val newTranslation = translations[newIndex]
       val views = RemoteViews(context.packageName, R.layout.translate_widget)
-      views.setTextViewText(R.id.nepali_text, "Woofers Nepali")
-      views.setTextViewText(R.id.english_text, "Woofers English")
+      views.setTextViewText(R.id.nepali_text, newTranslation.nepali)
+      views.setTextViewText(R.id.english_text, newTranslation.english)
+      prefs.saveCurrentTranslation(newTranslation)
       val newIntent = getPendingSelfIntent(context, NEXT_TRANSLATION_ACTION)
       views.setOnClickPendingIntent(R.id.widget_root, newIntent)
 

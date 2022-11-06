@@ -5,3 +5,4 @@ TODO:
 
 - Show list of words and allow enabling/disabling words
 - Something to reveal the english so you can quiz yourself?
+

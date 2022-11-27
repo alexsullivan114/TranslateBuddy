@@ -14,7 +14,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 class DownloadTranslationsWork(appContext: Context, workerParams: WorkerParameters) :
   Worker(appContext, workerParams) {
   override fun doWork(): Result {
-    val translations = GetTranslationsUseCase().invoke(applicationContext)
+    val translations = GetTranslationsUseCase().invoke(applicationContext).distinct()
     TranslationBuddyPreferences(applicationContext).saveTranslations(translations)
     return Result.success()
   }

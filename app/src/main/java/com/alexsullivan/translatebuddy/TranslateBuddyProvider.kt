@@ -19,6 +19,7 @@ class TranslateBuddyProvider : AppWidgetProvider() {
     val prefs = TranslationBuddyPreferences(context)
     if (intent.action == NEXT_TRANSLATION_ACTION) {
       val newTranslation = getNextTranslation(prefs)
+      Log.d("DEBUGGG:", "New translation: $newTranslation")
       updateWidgetWithTranslation(newTranslation, context)
       prefs.saveCurrentTranslation(newTranslation)
     } else {
@@ -38,13 +39,15 @@ class TranslateBuddyProvider : AppWidgetProvider() {
       .getAppWidgetIds(ComponentName(context, TranslateBuddyProvider::class.java))
 
     val appWidgetManager = AppWidgetManager.getInstance(context)
-    appWidgetManager.updateAppWidget(ids[0], views)
+    ids.forEach { appWidgetManager.updateAppWidget(it, views) }
   }
 
   private fun getNextTranslation(prefs: TranslationBuddyPreferences): Translation {
     val currentItem = prefs.getCurrentTranslation()
     val translations = prefs.getTranslations()
-    Log.d("DEBUGGG:", "Translations: $translations")
+    Log.d("DEBUGGG:", "Old translation: $currentItem")
+    Log.d("DEBUGGG:", "Old index: ${translations.indexOf(currentItem)}")
+    Log.d("DEBUGGG:", "Translations last index: ${translations.lastIndex}")
     val newIndex = (translations.indexOf(currentItem) + 1) % translations.lastIndex
     Log.d("DEBUGGG:", "New index: $newIndex")
     return translations[newIndex]

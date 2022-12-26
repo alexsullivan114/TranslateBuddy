@@ -63,10 +63,19 @@ class TranslationBuddyPreferences(context: Context) {
     prefs.edit().putString(WORD_GROUPS_KEY, serialized).apply()
   }
 
+  fun setSelectedWordGroup(wordGroup: WordGroup?) {
+    prefs.edit().putString(SELECTED_GROUP_KEY, wordGroup?.id).apply()
+  }
+
+  fun getSelectedWordGroup(): String? {
+    return prefs.getString(SELECTED_GROUP_KEY, null)
+  }
+
   companion object {
     private const val TRANSLATIONS_KEY = "translations"
     private const val CURRENT_TRANSLATION_KEY = "current_translation"
     private const val WORD_GROUPS_KEY = "groupings"
+    private const val SELECTED_GROUP_KEY = "selected_group"
     private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
   }
 }

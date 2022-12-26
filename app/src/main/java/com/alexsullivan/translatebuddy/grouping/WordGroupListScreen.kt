@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
 @Composable
 fun TranslationGroupingScreen(navController: NavController) {
   val preferences = TranslationBuddyPreferences(LocalContext.current)
+  var selectedWordGroupId by remember { mutableStateOf(preferences.getSelectedWordGroup()) }
   var wordGroups by remember { mutableStateOf(preferences.getWordGroups()) }
   var potentialDeletedWordGroup: WordGroup? by remember { mutableStateOf(null) }
   Scaffold(
@@ -31,7 +33,17 @@ fun TranslationGroupingScreen(navController: NavController) {
       items(wordGroups) { wordGroup ->
         WordGroupItem(wordGroup,
           onLongClick = { selectedGroup -> potentialDeletedWordGroup = selectedGroup },
-          onClick = { navController.navigate(Screen.AddGrouping.routeWithId(it.id)) }
+          onClick = { navController.navigate(Screen.AddGrouping.routeWithId(it.id)) },
+          selected = selectedWordGroupId == wordGroup.id,
+          onChecked = {
+            selectedWordGroupId = if (it) {
+              preferences.setSelectedWordGroup(wordGroup)
+              wordGroup.id
+            } else {
+              preferences.setSelectedWordGroup(null)
+              null
+            }
+          }
         )
       }
     }
@@ -53,7 +65,9 @@ fun TranslationGroupingScreen(navController: NavController) {
 fun WordGroupItem(
   wordGroup: WordGroup,
   onLongClick: (WordGroup) -> Unit,
-  onClick: (WordGroup) -> Unit
+  onClick: (WordGroup) -> Unit,
+  selected: Boolean,
+  onChecked: (Boolean) -> Unit
 ) {
   Card(
     backgroundColor = MaterialTheme.colors.background, contentColor = contentColorFor(
@@ -64,7 +78,14 @@ fun WordGroupItem(
       .combinedClickable(onLongClick = { onLongClick(wordGroup) }, onClick = { onClick(wordGroup) })
   ) {
     Column {
-      Text(wordGroup.name, style = MaterialTheme.typography.h4, modifier = Modifier.padding(8.dp))
+      Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Text(wordGroup.name, style = MaterialTheme.typography.h4, modifier = Modifier.padding(8.dp))
+        Checkbox(checked = selected, onCheckedChange = { onChecked(it) })
+      }
       for (translation in wordGroup.translations) {
         TranslationItem(translation)
       }

@@ -44,13 +44,19 @@ class TranslateBuddyProvider : AppWidgetProvider() {
 
   private fun getNextTranslation(prefs: TranslationBuddyPreferences): Translation {
     val currentItem = prefs.getCurrentTranslation()
-    val translations = prefs.getTranslations()
+    val translations = getSelectedGroupTranslations(prefs)
     Log.d("DEBUGGG:", "Old translation: $currentItem")
     Log.d("DEBUGGG:", "Old index: ${translations.indexOf(currentItem)}")
     Log.d("DEBUGGG:", "Translations last index: ${translations.lastIndex}")
-    val newIndex = (translations.indexOf(currentItem) + 1) % translations.lastIndex
+    val newIndex = (translations.indexOf(currentItem) + 1) % translations.size
     Log.d("DEBUGGG:", "New index: $newIndex")
     return translations[newIndex]
+  }
+
+  private fun getSelectedGroupTranslations(prefs: TranslationBuddyPreferences): List<Translation> {
+    return prefs.getWordGroups()
+      .firstOrNull { it.id == prefs.getSelectedWordGroupId() }?.translations
+      ?: prefs.getTranslations()
   }
 
   companion object {

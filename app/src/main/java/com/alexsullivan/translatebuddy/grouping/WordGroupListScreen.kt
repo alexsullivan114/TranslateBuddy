@@ -23,7 +23,7 @@ import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
 @Composable
 fun TranslationGroupingScreen(navController: NavController) {
   val preferences = TranslationBuddyPreferences(LocalContext.current)
-  var selectedWordGroupId by remember { mutableStateOf(preferences.getSelectedWordGroup()) }
+  var selectedWordGroupId by remember { mutableStateOf(preferences.getSelectedWordGroupId()) }
   var wordGroups by remember { mutableStateOf(preferences.getWordGroups()) }
   var potentialDeletedWordGroup: WordGroup? by remember { mutableStateOf(null) }
   Scaffold(
@@ -53,6 +53,10 @@ fun TranslationGroupingScreen(navController: NavController) {
         onCancel = { potentialDeletedWordGroup = null },
         onDelete = {
           preferences.removeWordGroup(it)
+          if (potentialDeletedWordGroup?.id == preferences.getSelectedWordGroupId()) {
+            preferences.setSelectedWordGroup(null)
+            selectedWordGroupId = null
+          }
           potentialDeletedWordGroup = null
           wordGroups = preferences.getWordGroups()
         })

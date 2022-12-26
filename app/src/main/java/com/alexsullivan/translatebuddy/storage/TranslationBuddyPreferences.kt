@@ -67,7 +67,7 @@ class TranslationBuddyPreferences(context: Context) {
     prefs.edit().putString(SELECTED_GROUP_KEY, wordGroup?.id).apply()
   }
 
-  fun getSelectedWordGroup(): String? {
+  fun getSelectedWordGroupId(): String? {
     return prefs.getString(SELECTED_GROUP_KEY, null)
   }
 

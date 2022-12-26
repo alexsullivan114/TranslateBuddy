@@ -23,17 +23,15 @@ import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
 import java.util.*
 
 @Composable
-fun CreateWordGroupScreen(navController: NavController) {
+fun CreateWordGroupScreen(navController: NavController, wordGroupId: String? = null) {
   val preferences = TranslationBuddyPreferences(LocalContext.current)
-  var wordGroup by remember {
-    mutableStateOf(
-      WordGroup(
-        UUID.randomUUID().toString(),
-        "",
-        emptyList()
-      )
+  val initialWordGroup =
+    preferences.getWordGroups().firstOrNull { it.id == wordGroupId } ?: WordGroup(
+      UUID.randomUUID().toString(),
+      "",
+      emptyList()
     )
-  }
+  var wordGroup by remember { mutableStateOf(initialWordGroup) }
 
   Scaffold(topBar = {
     TopAppBar(title = { Text("Add Grouping") }, actions = {
@@ -46,7 +44,7 @@ fun CreateWordGroupScreen(navController: NavController) {
     })
   }) { paddingValues ->
     Column(modifier = Modifier.padding(paddingValues)) {
-      var text by remember { mutableStateOf("") }
+      var text by remember { mutableStateOf(wordGroup.name) }
       val focusManager = LocalFocusManager.current
       Spacer(modifier = Modifier.height(8.dp))
       OutlinedTextField(

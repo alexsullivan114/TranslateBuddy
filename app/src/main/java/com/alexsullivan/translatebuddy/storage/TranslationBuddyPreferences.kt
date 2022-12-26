@@ -42,7 +42,7 @@ class TranslationBuddyPreferences(context: Context) {
   }
 
   fun saveWordGroup(wordGroup: WordGroup) {
-    val wordGroups = getWordGroups()
+    val wordGroups = getWordGroups().filter { it.id != wordGroup.id }
     val newWordGroups = listOf(wordGroup) + wordGroups
     val type = Types.newParameterizedType(List::class.java, WordGroup::class.java)
     val serialized = moshi.adapter<List<WordGroup>>(type).toJson(newWordGroups)

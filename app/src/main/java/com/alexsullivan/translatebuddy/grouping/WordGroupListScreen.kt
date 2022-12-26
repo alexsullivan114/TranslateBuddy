@@ -31,7 +31,7 @@ fun TranslationGroupingScreen(navController: NavController) {
       items(wordGroups) { wordGroup ->
         WordGroupItem(wordGroup,
           onLongClick = { selectedGroup -> potentialDeletedWordGroup = selectedGroup },
-          onClick = {}
+          onClick = { navController.navigate(Screen.AddGrouping.routeWithId(it.id)) }
         )
       }
     }
@@ -48,6 +48,7 @@ fun TranslationGroupingScreen(navController: NavController) {
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WordGroupItem(
   wordGroup: WordGroup,

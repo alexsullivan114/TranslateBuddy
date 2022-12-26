@@ -68,7 +68,13 @@ class LaunchActivity : ComponentActivity() {
         NavHost(navController, startDestination = TopLevelScreen.List.route, Modifier.padding(innerPadding)) {
           composable(TopLevelScreen.List.route) { TranslationListScreen(navController) }
           composable(TopLevelScreen.Grouping.route) { TranslationGroupingScreen(navController) }
-          composable(Screen.AddGrouping.route) { CreateWordGroupScreen(navController) }
+          composable(
+            Screen.AddGrouping.route,
+            arguments = Screen.AddGrouping.namedArguments
+          ) {
+            val wordGroupId = it.arguments?.getString(Screen.AddGrouping.arguments[0])
+            CreateWordGroupScreen(navController, wordGroupId)
+          }
         }
       }
     }

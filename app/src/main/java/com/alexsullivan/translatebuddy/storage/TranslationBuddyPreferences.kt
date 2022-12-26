@@ -3,6 +3,7 @@ package com.alexsullivan.translatebuddy.storage
 import android.content.Context
 import android.content.SharedPreferences
 import com.alexsullivan.translatebuddy.drive.Translation
+import com.alexsullivan.translatebuddy.grouping.WordGroup
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -40,9 +41,24 @@ class TranslationBuddyPreferences(context: Context) {
     }
   }
 
+  fun saveWordGroup(wordGroup: WordGroup) {
+    val wordGroups = getWordGroups()
+    val newWordGroups = listOf(wordGroup) + wordGroups
+    val type = Types.newParameterizedType(List::class.java, WordGroup::class.java)
+    val serialized = moshi.adapter<List<WordGroup>>(type).toJson(newWordGroups)
+    prefs.edit().putString(WORD_GROUPS_KEY, serialized).apply()
+  }
+
+  fun getWordGroups(): List<WordGroup> {
+    val serialized = prefs.getString(WORD_GROUPS_KEY, null) ?: return emptyList()
+    val type = Types.newParameterizedType(List::class.java, WordGroup::class.java)
+    return moshi.adapter<List<WordGroup>>(type).fromJson(serialized) ?: emptyList()
+  }
+
   companion object {
     private const val TRANSLATIONS_KEY = "translations"
     private const val CURRENT_TRANSLATION_KEY = "current_translation"
+    private const val WORD_GROUPS_KEY = "groupings"
     private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
   }
 }

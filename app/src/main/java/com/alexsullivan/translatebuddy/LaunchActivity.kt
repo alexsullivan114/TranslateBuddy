@@ -1,36 +1,31 @@
 package com.alexsullivan.translatebuddy
 
-import android.app.job.JobScheduler
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.alexsullivan.translatebuddy.drive.GetTranslationsUseCase
-import com.alexsullivan.translatebuddy.drive.Translation
-import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
+import com.alexsullivan.translatebuddy.grouping.CreateWordGroupScreen
+import com.alexsullivan.translatebuddy.grouping.TranslationGroupingScreen
+import com.alexsullivan.translatebuddy.list.TranslationListScreen
 import com.alexsullivan.translatebuddy.work.DownloadTranslationsWork
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import com.google.api.services.drive.DriveScopes
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class LaunchActivity : ComponentActivity() {
@@ -38,32 +33,47 @@ class LaunchActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      TranslationList()
+      val navController = rememberNavController()
+      Scaffold(
+        bottomBar = {
+          BottomNavigation {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            val items = listOf(TopLevelScreen.List, TopLevelScreen.Grouping)
+            items.forEach { screen ->
+              BottomNavigationItem(
+                icon = { Icon(screen.icon, contentDescription = null) },
+                label = { Text(stringResource(screen.stringId)) },
+                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                onClick = {
+                  navController.navigate(screen.route) {
+                    // Pop up to the start destination of the graph to
+                    // avoid building up a large stack of destinations
+                    // on the back stack as users select items
+                    popUpTo(navController.graph.findStartDestination().id) {
+                      saveState = true
+                    }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
+                  }
+                }
+              )
+            }
+          }
+        }
+      ) { innerPadding ->
+        NavHost(navController, startDestination = TopLevelScreen.List.route, Modifier.padding(innerPadding)) {
+          composable(TopLevelScreen.List.route) { TranslationListScreen(navController) }
+          composable(TopLevelScreen.Grouping.route) { TranslationGroupingScreen(navController) }
+          composable(Screen.AddGrouping.route) { CreateWordGroupScreen(navController) }
+        }
+      }
     }
 
     signIn()
-  }
-
-  @Composable
-  private fun TranslationList() {
-    val translations = TranslationBuddyPreferences(applicationContext).getTranslations()
-    LazyColumn(
-      contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-      items(translations) { translation ->
-        TranslationItem(translation)
-        Divider()
-      }
-    }
-  }
-
-  @Composable
-  private fun TranslationItem(translation: Translation) {
-    Text(
-      text = "${translation.english} -> ${translation.nepali}",
-      style = TextStyle(fontSize = 24.sp)
-    )
   }
 
   private fun isUserSignedIn(): Boolean {

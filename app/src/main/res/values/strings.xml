@@ -1,3 +1,5 @@
 <resources>
   <string name="app_name">TranslateBuddy</string>
+  <string name="translations">Translations</string>
+  <string name="groupings">Groupings</string>
 </resources>

@@ -55,6 +55,14 @@ class TranslationBuddyPreferences(context: Context) {
     return moshi.adapter<List<WordGroup>>(type).fromJson(serialized) ?: emptyList()
   }
 
+  fun removeWordGroup(wordGroup: WordGroup) {
+    val wordGroups = getWordGroups()
+    val newWordGroups = wordGroups - wordGroup
+    val type = Types.newParameterizedType(List::class.java, WordGroup::class.java)
+    val serialized = moshi.adapter<List<WordGroup>>(type).toJson(newWordGroups)
+    prefs.edit().putString(WORD_GROUPS_KEY, serialized).apply()
+  }
+
   companion object {
     private const val TRANSLATIONS_KEY = "translations"
     private const val CURRENT_TRANSLATION_KEY = "current_translation"

@@ -37,7 +37,10 @@ fun CreateWordGroupScreen(navController: NavController) {
 
   Scaffold(topBar = {
     TopAppBar(title = { Text("Add Grouping") }, actions = {
-      IconButton(onClick = { preferences.saveWordGroup(wordGroup) }) {
+      IconButton(onClick = {
+        preferences.saveWordGroup(wordGroup)
+        navController.popBackStack()
+      }) {
         Icon(Icons.Filled.Done, "Save")
       }
     })

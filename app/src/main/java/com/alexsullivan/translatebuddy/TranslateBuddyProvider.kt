@@ -23,8 +23,7 @@ class TranslateBuddyProvider : AppWidgetProvider() {
       updateWidgetWithTranslation(newTranslation, context)
       prefs.saveCurrentTranslation(newTranslation)
     } else {
-      val newTranslation = prefs.getCurrentTranslation() ?: Translation("--", "--")
-      updateWidgetWithTranslation(newTranslation, context)
+      updateWidgetWithTranslation(getNextTranslation(prefs), context)
     }
   }
 

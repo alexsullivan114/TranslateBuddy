@@ -19,10 +19,12 @@ import androidx.navigation.NavController
 import com.alexsullivan.translatebuddy.Screen
 import com.alexsullivan.translatebuddy.drive.Translation
 import com.alexsullivan.translatebuddy.storage.TranslationBuddyPreferences
+import com.alexsullivan.translatebuddy.utils.refreshWidget
 
 @Composable
 fun TranslationGroupingScreen(navController: NavController) {
-  val preferences = TranslationBuddyPreferences(LocalContext.current)
+  val context = LocalContext.current
+  val preferences = TranslationBuddyPreferences(context)
   var selectedWordGroupId by remember { mutableStateOf(preferences.getSelectedWordGroupId()) }
   var wordGroups by remember { mutableStateOf(preferences.getWordGroups()) }
   var potentialDeletedWordGroup: WordGroup? by remember { mutableStateOf(null) }
@@ -38,6 +40,7 @@ fun TranslationGroupingScreen(navController: NavController) {
           onChecked = {
             selectedWordGroupId = if (it) {
               preferences.setSelectedWordGroup(wordGroup)
+              refreshWidget(context)
               wordGroup.id
             } else {
               preferences.setSelectedWordGroup(null)
